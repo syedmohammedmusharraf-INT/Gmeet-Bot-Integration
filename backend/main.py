@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.sessions import router
+from backend.routes.sessions import router
 
 app = FastAPI(title="INT Meeting Recorder API")
 
