@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+    container_name: int-meet-recorder
+    privileged: true
+    shm_size: "2gb"
+    ipc: host
+    restart: unless-stopped
+    ports:
+      - "4000:8000"
+      - "4014:6080"
+    env_file:
+      - ./.env
+    environment:
+      - DISPLAY=:99
+      - PULSE_SERVER=unix:/var/run/pulse/native
+      - PULSE_SINK=VirtualMic
+      - PULSE_SOURCE=VirtualMicSource
+    volumes:
+      - ./recordings:/app/recordings
+      - ./chrome-profile:/tmp/chrome-profile
+      - ./chrome-profile-backup:/tmp/chrome-profile-backup
+      - /dev/shm:/dev/shm
