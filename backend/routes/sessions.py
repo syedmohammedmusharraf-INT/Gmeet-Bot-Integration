@@ -7,7 +7,7 @@ import time
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from backend.models.schemas import (
+from models.schemas import (
     JoinSilentRequest, StartResponse, SessionStatus,
     StopResponse, RecordingInfo, RecordingListResponse,
 )

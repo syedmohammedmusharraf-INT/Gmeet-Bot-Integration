@@ -12,18 +12,35 @@ sleep 2
 echo "Xvfb started"
 
 echo "[2/6] Starting noVNC on port 6080..."
-x11vnc -display :99 -nopw -listen localhost -xkb -forever -shared -bg -o /tmp/x11vnc.log
+killall -9 x11vnc 2>/dev/null || true
+killall -9 websockify 2>/dev/null || true
+sleep 1
+x11vnc -display :99 -nopw -localhost -xkb -forever -shared -bg -o /tmp/x11vnc.log 2>&1
+sleep 2
+if ! pgrep -x x11vnc > /dev/null 2>&1; then
+    echo "FATAL: x11vnc failed to start"
+    cat /tmp/x11vnc.log
+    exit 1
+fi
+echo "x11vnc running (PID $(pgrep -x x11vnc))"
 websockify --web /usr/share/novnc --wrap-mode=ignore 0.0.0.0:6080 localhost:5900 > /tmp/novnc.log 2>&1 &
 sleep 2
+if ! pgrep -x websockify > /dev/null 2>&1; then
+    echo "FATAL: websockify failed to start"
+    cat /tmp/novnc.log
+    exit 1
+fi
 echo "noVNC ready - http://localhost:6080/vnc.html"
 
 echo "[3/6] Starting PulseAudio..."
-pulseaudio --kill 2>/dev/null || killall pulseaudio 2>/dev/null || true
+pulseaudio --kill 2>/dev/null || true
+killall -9 pulseaudio 2>/dev/null || true
 sleep 1
+rm -f /var/run/pulse/pid /run/pulse/pid /tmp/pulse-*.pid /var/run/pulse/native 2>/dev/null || true
 mkdir -p /var/run/pulse
 chmod 755 /var/run/pulse
 pulseaudio \
-    --system --daemonize=no -n \
+    --daemonize=no -n \
     --load="module-native-protocol-unix socket=/var/run/pulse/native auth-anonymous=1" \
     --load="module-always-sink" \
     --exit-idle-time=-1 --log-level=error \

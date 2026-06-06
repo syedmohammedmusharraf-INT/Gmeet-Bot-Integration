@@ -17,7 +17,7 @@ import threading
 import time
 import numpy as np
 import sounddevice as sd
-from backend.join_meet import run_meet
+from join_meet import run_meet
 
 # ── Config ────────────────────────────────────────────────────────────────────
 SESSION_ID    = os.getenv("SESSION_ID", "default")
